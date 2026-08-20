@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CosmoCalc — Harmonic Correspondence Calculator</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header class="masthead">
+    <div class="masthead-inner">
+      <div class="masthead-top">
+        <h1 class="brand">Cosmo<span class="brand-accent">Calc</span></h1>
+        <button class="btn btn-theme" id="theme-toggle" type="button" aria-label="Toggle theme">☾</button>
+      </div>
+      <p class="tagline">One vibration, six doors. Angle · Color · Frequency · Length · Grade · Unbound.</p>
+      <p class="honest-note">Root 432 Hz at exactly 1 radian. No fudge factors — just physics.</p>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <!-- Four doors -->
+    <section class="doors" aria-label="Input doors">
+      <div class="door">
+        <label class="door-label" for="in-angle">Angle</label>
+        <div class="door-input">
+          <input id="in-angle" type="number" step="any" placeholder="57.2958" />
+          <span class="unit">°</span>
+        </div>
+      </div>
+      <div class="door">
+        <label class="door-label" for="in-nm">Color</label>
+        <div class="door-input">
+          <input id="in-nm" type="number" step="any" placeholder="631" />
+          <span class="unit">nm</span>
+        </div>
+      </div>
+      <div class="door">
+        <label class="door-label" for="in-hz">Frequency</label>
+        <div class="door-input">
+          <input id="in-hz" type="number" step="any" placeholder="432" />
+          <span class="unit">Hz</span>
+        </div>
+      </div>
+      <div class="door">
+        <label class="door-label" for="in-length">Length</label>
+        <div class="door-input">
+          <input id="in-length" type="number" step="any" placeholder="0.794" />
+          <span class="unit">m</span>
+        </div>
+      </div>
+      <div class="door">
+        <label class="door-label" for="in-grade">Grade</label>
+        <div class="door-input">
+          <input id="in-grade" type="number" step="any" placeholder="306.67" />
+          <span class="unit">g</span>
+        </div>
+      </div>
+      <div class="door">
+        <label class="door-label" for="in-unbound">Unbound Angle</label>
+        <div class="door-input">
+          <input id="in-unbound" type="number" step="any" placeholder="57.2958" />
+          <span class="unit">°</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Results -->
+    <section class="results" aria-label="Results">
+      <div class="swatch-panel">
+        <div class="swatch" id="swatch"></div>
+        <div class="swatch-meta">
+          <div class="swatch-line"><span class="k">Color</span><span class="v" id="out-hex">—</span></div>
+          <div class="swatch-line"><span class="k">RGB</span><span class="v" id="out-rgb">—</span></div>
+          <div class="swatch-line"><span class="k">Inverse</span><span class="v" id="out-inv-hex">—</span></div>
+        </div>
+        <div class="swatch inv" id="inv-swatch"></div>
+        <div class="rad-line">
+          <span class="k">Universal Pendulum</span>
+          <span class="v" id="out-rad-name">—</span>
+        </div>
+        <div class="rad-line">
+          <span class="k">400-Grade</span>
+          <span class="v" id="out-rad-grade">—</span>
+        </div>
+      </div>
+
+      <div class="readouts">
+        <div class="readout"><span class="k">Angle</span><span class="v" id="out-angle">—</span></div>
+        <div class="readout"><span class="k">Frequency</span><span class="v" id="out-hz">—</span></div>
+        <div class="readout"><span class="k">Overtone</span><span class="v" id="out-overtone">—</span></div>
+        <div class="readout"><span class="k">Color</span><span class="v" id="out-nm">—</span></div>
+        <div class="readout"><span class="k">Length</span><span class="v" id="out-length">—</span></div>
+        <div class="readout"><span class="k">Note (432)</span><span class="v" id="out-note">—</span></div>
+        <div class="readout"><span class="k">Octaves</span><span class="v" id="out-octaves">—</span></div>
+      </div>
+    </section>
+
+    <!-- Unbound angle -->
+    <section class="unbound" aria-label="Unbound angle">
+      <h2 class="section-title">Unbound Angle</h2>
+      <p class="converter-note">Raw angle · not bound to 432 · degrees &amp; grades</p>
+      <div class="unbound-grid">
+        <div class="glyph-cell">
+          <svg id="angle-glyph" viewBox="0 0 200 200" class="angle-glyph" aria-hidden="true">
+            <circle cx="100" cy="100" r="88" class="glyph-circle" />
+            <circle cx="100" cy="100" r="2.5" class="glyph-center" />
+            <line id="glyph-arm-a" x1="100" y1="100" x2="12" y2="100" class="glyph-arm" />
+            <line id="glyph-arm-b" x1="100" y1="100" x2="12" y2="100" class="glyph-arm glyph-arm-b" />
+          </svg>
+          <div class="glyph-label">Degrees · 0° at West</div>
+          <div class="glyph-readout" id="out-unbound-deg">—</div>
+        </div>
+        <div class="glyph-cell">
+          <svg id="grade-glyph" viewBox="0 0 200 200" class="angle-glyph" aria-hidden="true">
+            <circle cx="100" cy="100" r="88" class="glyph-circle" />
+            <circle cx="100" cy="100" r="2.5" class="glyph-center" />
+            <line id="grade-arm-a" x1="100" y1="100" x2="100" y2="188" class="glyph-arm" />
+            <line id="grade-arm-b" x1="100" y1="100" x2="100" y2="188" class="glyph-arm glyph-arm-b" />
+          </svg>
+          <div class="glyph-label">Grades · 0g at South</div>
+          <div class="glyph-readout" id="out-unbound-grade">—</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Length converter -->
+    <section class="converter" aria-label="Length converter">
+      <h2 class="section-title">Length Converter</h2>
+      <p class="converter-note">Meter · Centimeter · Decimal Foot · Decimal Inch</p>
+      <div class="conv-grid">
+        <div class="conv">
+          <label class="door-label" for="conv-m">Meter</label>
+          <div class="door-input">
+            <input id="conv-m" type="number" step="any" placeholder="e.g. 0.794" />
+            <span class="unit">m</span>
+          </div>
+        </div>
+        <div class="conv">
+          <label class="door-label" for="conv-cm">Centimeter</label>
+          <div class="door-input">
+            <input id="conv-cm" type="number" step="any" placeholder="e.g. 79.4" />
+            <span class="unit">cm</span>
+          </div>
+        </div>
+        <div class="conv">
+          <label class="door-label" for="conv-ft">Decimal Foot</label>
+          <div class="door-input">
+            <input id="conv-ft" type="number" step="any" placeholder="e.g. 2.605" />
+            <span class="unit">ft</span>
+          </div>
+        </div>
+        <div class="conv">
+          <label class="door-label" for="conv-in">Decimal Inch</label>
+          <div class="door-input">
+            <input id="conv-in" type="number" step="any" placeholder="e.g. 31.26" />
+            <span class="unit">in</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Journal -->
+    <section class="journal" aria-label="Journal">
+      <div class="journal-head">
+        <h2 class="section-title">Journal</h2>
+        <button class="btn btn-primary" id="note-new">+ New Note</button>
+      </div>
+
+      <div class="note-editor" id="note-editor">
+        <input id="note-title" type="text" placeholder="Title" class="note-title-input" />
+        <textarea id="note-body" placeholder="Capture a reading, a color, a hunch…" class="note-body-input"></textarea>
+        <div class="note-editor-actions">
+          <button class="btn btn-ghost" id="note-cancel">Cancel</button>
+          <button class="btn btn-primary" id="note-add">Save</button>
+        </div>
+      </div>
+
+      <div class="journal-list" id="journal-list"></div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <p>CosmoCalc · honest harmonic correspondence · 432 tuning</p>
+    <p class="credit">Built with Areli Aurelia Seshat · Agent of Delphi House</p>
+  </footer>
+
+  <script src="js/engine.js"></script>
+  <script src="js/color.js"></script>
+  <script src="js/journal.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
