@@ -429,6 +429,67 @@ html, body {
   gap: 14px;
 }
 
+/* ---- Wave of Chartres ---- */
+.wave-swatch-lg {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  flex: 0 0 auto;
+}
+.wave-wheel-wrap {
+  display: flex;
+  justify-content: center;
+  margin: 6px 0 4px;
+}
+#wave-wheel {
+  max-width: 100%;
+  height: auto;
+}
+.wave-angle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  font-family: var(--serif);
+  font-size: 1.05rem;
+  color: var(--gold-soft);
+  margin-top: 10px;
+}
+.wave-table-wrap {
+  margin-top: 16px;
+  overflow-x: auto;
+}
+.wave-table {
+  width: 100%;
+  max-width: 520px;
+  margin: 0 auto;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+.wave-table th, .wave-table td {
+  padding: 6px 10px;
+  text-align: left;
+  border-bottom: 1px solid var(--line);
+}
+.wave-table th {
+  color: var(--gold-soft);
+  font-family: var(--serif);
+  font-weight: normal;
+  letter-spacing: 0.04em;
+}
+.wave-table td {
+  color: var(--muted);
+}
+.wave-swatch-sm {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  vertical-align: middle;
+}
+
 .foot {
   text-align: center;
   color: var(--muted);
