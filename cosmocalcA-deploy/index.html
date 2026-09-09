@@ -99,7 +99,7 @@
     <!-- Unbound angle -->
     <section class="unbound" aria-label="Unbound angle">
       <h2 class="section-title">Unbound Angle</h2>
-      <p class="converter-note">Raw angle · not bound to 432 · degrees &amp; grades</p>
+      <p class="converter-note">Not the 432-tuned angle — raw degrees only, for pinpointing energy. Shows degrees &amp; grades.</p>
       <div class="unbound-grid">
         <div class="glyph-cell">
           <svg id="angle-glyph" viewBox="0 0 200 200" class="angle-glyph" aria-hidden="true">
@@ -121,6 +121,28 @@
           <div class="glyph-label">Grades · 0g at South</div>
           <div class="glyph-readout" id="out-unbound-grade">—</div>
         </div>
+      </div>
+    </section>
+
+    <!-- Wave of Chartres -->
+    <section class="converter" aria-label="Wave of Chartres">
+      <h2 class="section-title">Wave of Chartres</h2>
+      <p class="converter-note">The six diametric inversion pairs of the 12-color wheel. Each is exactly 180° apart — a pure polarity pairing. Together they build the Wave of Chartres (de la Foye, 1975, p. 79).</p>
+      <div class="wave-wheel-wrap">
+        <canvas id="wave-wheel" width="320" height="320" aria-label="Wave of Chartres ray wheel"></canvas>
+      </div>
+      <div class="wave-angle" id="wave-angle">
+        <span class="wave-swatch wave-swatch-lg" id="wave-swatch-a"></span>
+        <span class="wave-angle-text" id="wave-angle-text">Enter an angle</span>
+        <span class="wave-swatch wave-swatch-lg" id="wave-swatch-b"></span>
+      </div>
+      <div class="wave-table-wrap">
+        <table class="wave-table" id="wave-table">
+          <thead>
+            <tr><th>Color</th><th>Angle</th><th>Offset</th><th>Hex</th><th>RGB</th></tr>
+          </thead>
+          <tbody id="wave-table-body"></tbody>
+        </table>
       </div>
     </section>
 
