@@ -65,6 +65,7 @@
       out.radGrade.textContent = '—';
       unboundInput.value = '';
       renderUnbound(0);
+      renderWave(NaN);
       return;
     }
 
@@ -109,6 +110,7 @@
     /* Reflect the current angle in the unbound glyph. */
     unboundInput.value = fmt(result.angle, 4);
     renderUnbound(result.angle);
+    renderWave(result.angle);
   }
 
   function computeFromDoor(source) {
@@ -165,6 +167,142 @@
     if (isNaN(raw)) { renderUnbound(0); return; }
     renderUnbound(raw);
   });
+
+  /* ---- Wave of Chartres ---- */
+  const waveAngleText = document.getElementById('wave-angle-text');
+  const waveSwatchA = document.getElementById('wave-swatch-a');
+  const waveSwatchB = document.getElementById('wave-swatch-b');
+  const waveWheel = document.getElementById('wave-wheel');
+  const waveTableBody = document.getElementById('wave-table-body');
+
+  /* The 12 polarity colors at 30° steps, 0° = Red at West. */
+  const WAVE_12 = [
+    { deg: 0,   name: 'Red' },
+    { deg: 30,  name: 'Orange' },
+    { deg: 60,  name: 'Yellow' },
+    { deg: 90,  name: 'Green' },
+    { deg: 120, name: 'Blue' },
+    { deg: 150, name: 'Indigo' },
+    { deg: 180, name: 'Violet' },
+    { deg: 210, name: 'Ultra-Violet' },
+    { deg: 240, name: 'White' },
+    { deg: 270, name: 'Negative Green' },
+    { deg: 300, name: 'Black' },
+    { deg: 330, name: 'Infra-Red' }
+  ];
+
+  function rgbToHex(r, g, b) {
+    return '#' + [r, g, b].map(function (v) {
+      return Math.round(v).toString(16).padStart(2, '0');
+    }).join('');
+  }
+
+  /* Engine color at an angle — the SAME octave-shift math as the main
+     swatch (nm = c/fLight after shifting the sound Hz into the visible
+     band). This is the honest model; the opposite ray is its natural
+     inverse. */
+  function engineColorFromAngle(angle) {
+    const hz = angleToHz(angle);
+    const nm = hzToNm(hz) * 1e9;
+    const rgb = wavelengthToRGB(nm);
+    return { r: rgb.r, g: rgb.g, b: rgb.b, nm: nm };
+  }
+
+  /* Dynamic rotating wheel. The 12-spoke pattern (30° apart) rotates so
+     the input angle's ray sits at the input angle's own position. Each
+     spoke is a tapered wedge in its real spectral color; the input ray
+     is drawn larger with a gold outline. */
+  function renderWaveWheel(angle) {
+    if (!waveWheel) return;
+    const ctx = waveWheel.getContext('2d');
+    const W = waveWheel.width, H = waveWheel.height;
+    const cx = W / 2, cy = H / 2, R = Math.min(W, H) / 2 - 12;
+    ctx.clearRect(0, 0, W, H);
+    const a = isFinite(angle) ? ((angle % 360) + 360) % 360 : 0;
+    for (let n = 0; n < 12; n++) {
+      const absAngle = (a + n * 30) % 360;
+      const posRad = (absAngle + 180) * Math.PI / 180; // 0° = West, clockwise
+      const c = engineColorFromAngle(absAngle);
+      const isActive = (n === 0);
+      const tipX = cx + Math.cos(posRad) * R;
+      const tipY = cy + Math.sin(posRad) * R;
+      const baseW = isActive ? 9 : 5;
+      const px = -Math.sin(posRad), py = Math.cos(posRad);
+      ctx.beginPath();
+      ctx.moveTo(cx + px * baseW, cy + py * baseW);
+      ctx.lineTo(tipX, tipY);
+      ctx.lineTo(cx - px * baseW, cy - py * baseW);
+      ctx.closePath();
+      ctx.fillStyle = rgbToCss(c.r, c.g, c.b);
+      ctx.fill();
+      if (isActive) {
+        ctx.strokeStyle = 'rgba(212,175,55,0.95)';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      }
+    }
+    ctx.fillStyle = 'rgba(212,175,55,0.9)';
+    ctx.beginPath(); ctx.arc(cx, cy, 5, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.stroke();
+  }
+
+  /* Design table: all 12 colors, their absolute angles (computed from
+     the input angle), their offset, and their hex + RGB values. */
+  function renderWaveTable(angle) {
+    if (!waveTableBody) return;
+    waveTableBody.innerHTML = '';
+    const a = isFinite(angle) ? ((angle % 360) + 360) % 360 : 0;
+    for (let n = 0; n < 12; n++) {
+      const absAngle = (a + n * 30) % 360;
+      const c = engineColorFromAngle(absAngle);
+      const name = colorNameFromNm(c.nm);
+      const hex = rgbToHex(c.r, c.g, c.b);
+      const rgb = 'rgb(' + Math.round(c.r) + ', ' + Math.round(c.g) + ', ' + Math.round(c.b) + ')';
+      const tr = document.createElement('tr');
+      const td1 = document.createElement('td');
+      const sw = document.createElement('span');
+      sw.className = 'wave-swatch-sm';
+      sw.style.background = rgbToCss(c.r, c.g, c.b);
+      td1.appendChild(sw);
+      td1.appendChild(document.createTextNode(' ' + name));
+      const td2 = document.createElement('td');
+      td2.textContent = absAngle + '°';
+      const td3 = document.createElement('td');
+      td3.textContent = (n === 0) ? 'input' : '+' + (n * 30) + '°';
+      const td4 = document.createElement('td');
+      td4.textContent = hex;
+      const td5 = document.createElement('td');
+      td5.textContent = rgb;
+      tr.appendChild(td1); tr.appendChild(td2); tr.appendChild(td3); tr.appendChild(td4); tr.appendChild(td5);
+      waveTableBody.appendChild(tr);
+    }
+  }
+
+  function renderWave(angle) {
+    if (!isFinite(angle)) {
+      waveAngleText.textContent = 'Enter an angle';
+      waveSwatchA.style.background = 'transparent';
+      waveSwatchB.style.background = 'transparent';
+      renderWaveWheel(NaN);
+      renderWaveTable(NaN);
+      return;
+    }
+    const a = ((angle % 360) + 360) % 360;
+    const opp = (a + 180) % 360;
+    const c = engineColorFromAngle(a);
+    const oc = engineColorFromAngle(opp);
+    const rgb = 'rgb(' + Math.round(c.r) + ', ' + Math.round(c.g) + ', ' + Math.round(c.b) + ')';
+    const orgb = 'rgb(' + Math.round(oc.r) + ', ' + Math.round(oc.g) + ', ' + Math.round(oc.b) + ')';
+    waveSwatchA.style.background = rgb;
+    waveSwatchB.style.background = orgb;
+    waveAngleText.textContent = a.toFixed(2) + '° ' + rgb + '  ↔  ' + opp.toFixed(2) + '° ' + orgb;
+    renderWaveWheel(a);
+    renderWaveTable(a);
+  }
+
+  renderWave(NaN);
 
   /* ---- Length converter (m / cm / decimal ft / decimal in) ---- */
   const conv = {
